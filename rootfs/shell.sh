@@ -1,3 +1,3 @@
 #!/bin/sh
 
-chroot /media/sdb1 /bin/bash -c 'neofetch ; exec /bin/bash'
+chroot /media/sdb2 /bin/bash -c 'neofetch ; exec /bin/bash'

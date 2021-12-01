@@ -1,9 +1,9 @@
 #!/bin/sh
 
-cd /media/sdb1
+cd /media/sdb2
 
 mount -t proc /proc proc/
 mount --rbind /sys sys/
 mount --rbind /dev dev/
 
-chroot /media/sdb1 /start.sh
+chroot /media/sdb2 /start.sh
