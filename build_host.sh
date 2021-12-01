@@ -2,7 +2,7 @@
 
 apt update
 apt dist-upgrade -y 
-DEBIAN_FRONTEND=noninteractive apt -y install git build-essential wget qemu qemu-user-static binfmt-support libarchive-tools qemu-utils sudo
+DEBIAN_FRONTEND=noninteractive apt -y install git build-essential wget qemu qemu-user-static binfmt-support libarchive-tools qemu-utils sudo rsync nano
 
 update-binfmts --enable qemu-arm
 
