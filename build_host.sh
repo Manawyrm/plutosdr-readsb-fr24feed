@@ -9,30 +9,32 @@ update-binfmts --enable qemu-arm
 SCRIPT_DIR="$(dirname "$(realpath "$0")")"
 BUILD_DIR="${SCRIPT_DIR}/build"
 
-mkdir -p ${BUILD_DIR}
+mkdir -p "${BUILD_DIR}"
 wget http://os.archlinuxarm.org/os/ArchLinuxARM-zedboard-latest.tar.gz
-bsdtar -xpf ArchLinuxARM-zedboard-latest.tar.gz -C ${BUILD_DIR}
+bsdtar -xpf ArchLinuxARM-zedboard-latest.tar.gz -C "${BUILD_DIR}"
 
-rsync -a rootfs/. ${BUILD_DIR}
+rsync -a rootfs/. "${BUILD_DIR}"
 
-rm ${BUILD_DIR}/etc/resolv.conf
-echo "nameserver 8.8.8.8" > ${BUILD_DIR}/etc/resolv.conf
+rm "${BUILD_DIR}/etc/resolv.conf"
+echo "nameserver 8.8.8.8" > "${BUILD_DIR}/etc/resolv.conf"
 
-mount -t proc /proc ${BUILD_DIR}/proc/
-mount --rbind /sys ${BUILD_DIR}/sys/
-mount --rbind /dev ${BUILD_DIR}/dev/
+mount -t proc /proc "${BUILD_DIR}/proc/"
+mount --rbind /sys "${BUILD_DIR}/sys/"
+mount --rbind /dev "${BUILD_DIR}/dev/"
 
 # pacman's CheckSpace mechanism doesn't work in a chroot which isn't on the root of a filesystem
 # Just disable it...
-sed -i '/CheckSpace/d' ${BUILD_DIR}/etc/pacman.conf
+sed -i '/CheckSpace/d' "${BUILD_DIR}/etc/pacman.conf"
 
-chroot ${BUILD_DIR} /build_arm.sh
+chroot "${BUILD_DIR}" /build_arm.sh
+
+IMAGE_PATH="${SCRIPT_DIR}/usb.img"
 
 # create a 5GiB image file
-truncate -s 5G /opt/usb.img
+truncate -s 5G "${IMAGE_PATH}"
 
 # partition it, MBR partition layout, 100MiB FAT32 config, rest as ext4
-sed -e 's/\s*\([\+0-9a-zA-Z]*\).*/\1/' << EOF | fdisk /opt/usb.img
+sed -e 's/\s*\([\+0-9a-zA-Z]*\).*/\1/' << EOF | fdisk "${IMAGE_PATH}"
   o # clear the in memory partition table
   n # new partition
   p # primary partition
@@ -54,39 +56,42 @@ sed -e 's/\s*\([\+0-9a-zA-Z]*\).*/\1/' << EOF | fdisk /opt/usb.img
 EOF
 
 # loop mount the image file
-loopdev=$(losetup -f --show -P /opt/usb.img)
+loopdev="$(losetup -f --show -P "${IMAGE_PATH}")"
 
 # create both file systems
-mkfs.vfat ${loopdev}p1
-mkfs.ext4 ${loopdev}p2
+mkfs.vfat "${loopdev}p1"
+mkfs.ext4 "${loopdev}p2"
 
 # create mount points
-mkdir /opt/usb_fat32
-mkdir /opt/usb_ext4
+FAT32_MOUNT="${SCRIPT_DIR}/usb_fat32"
+EXT4_MOUNT="${SCRIPT_DIR}/usb_ext4"
+
+mkdir "${FAT32_MOUNT}"
+mkdir "${EXT4_MOUNT}"
 
 # mount the filesystems
-mount ${loopdev}p1 /opt/usb_fat32
-mount ${loopdev}p2 /opt/usb_ext4
+mount "${loopdev}p1" "${FAT32_MOUNT}"
+mount "${loopdev}p2" "${EXT4_MOUNT}"
 
 # unmount the bind-mounts inside the chroot
-umount -fl ${BUILD_DIR}/proc
-umount -fl ${BUILD_DIR}/sys
-umount -fl ${BUILD_DIR}/dev
+umount -fl "${BUILD_DIR}/proc"
+umount -fl "${BUILD_DIR}/sys"
+umount -fl "${BUILD_DIR}/dev"
 
-umount ${BUILD_DIR}/proc
-umount ${BUILD_DIR}/sys
-umount ${BUILD_DIR}/dev
+umount "${BUILD_DIR}/proc"
+umount "${BUILD_DIR}/sys"
+umount "${BUILD_DIR}/dev"
 
 # copy the root fs to the ext4 partition
-rsync -a ${BUILD_DIR}/. /opt/usb_ext4/
-rsync -a configfs/. /opt/usb_fat32/
+rsync -a "${BUILD_DIR}/." "${EXT4_MOUNT}"
+rsync -a configfs/. "${FAT32_MOUNT}"
 
 # unmount the partitions
-umount /opt/usb_fat32
-umount /opt/usb_ext4
+umount "${FAT32_MOUNT}"
+umount "${EXT4_MOUNT}"
 
 # unmount the loop mount
-losetup -D ${loopdev}
+losetup -D "${loopdev}"
 
 # compress the resulting image (using multi-core gzip)
-time pigz /opt/usb.img
+time pigz "${IMAGE_PATH}"
