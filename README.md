@@ -1,6 +1,8 @@
 # plutosdr-readsb-fr24feed
 PlutoSDR standalone ADS-B decoder and FR24 feeder (using readsb)
 
+![https://screenshot.tbspace.de/eapbuojdngt.png](https://screenshot.tbspace.de/eapbuojdngt.png)  
+
 ### Building image
 Building this image is done using qemu-user-static (by running the ArchLinux ARM image in user/static emulation) and does quite a bit of modifications to your system (installing packages, changing binfmt settings, putting stuff in /opt, etc.).  
 __Please don't run this on your computer! Use a VM, Docker, GitHub Actions, etc.__  
