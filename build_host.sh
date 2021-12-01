@@ -2,7 +2,7 @@
 
 apt update
 apt dist-upgrade -y 
-DEBIAN_FRONTEND=noninteractive apt -y install git build-essential wget qemu qemu-user-static binfmt-support libarchive-tools qemu-utils sudo rsync nano
+DEBIAN_FRONTEND=noninteractive apt -y install git build-essential wget qemu qemu-user-static binfmt-support libarchive-tools qemu-utils sudo rsync nano dosfstools 
 
 update-binfmts --enable qemu-arm
 
@@ -25,3 +25,30 @@ sed -i '/CheckSpace/d' /opt/mnt/etc/pacman.conf
 
 chroot /opt/mnt /build_arm.sh
 
+truncate -s 10G /opt/usb.img
+
+sed -e 's/\s*\([\+0-9a-zA-Z]*\).*/\1/' << EOF | fdisk /opt/usb.img
+  o # clear the in memory partition table
+  n # new partition
+  p # primary partition
+  1 # partition number 1
+    # default - start at beginning of disk 
+  +100M # 100 MB FAT32 config parttion
+  t # Change partition type to FAT32
+  0c # Hex code for W95 FAT32 (LBA)
+  n # new partition
+  p # primary partition
+  2 # partion number 2
+    # default, start immediately after preceding partition
+    # default, extend partition to end of disk
+  a # make a partition bootable
+  1 # bootable partition is partition 1 -- /dev/sda1
+  p # print the in-memory partition table
+  w # write the partition table
+  q # and we're done
+EOF
+
+losetup -P /dev/loop0 /opt/usb.img
+
+mkfs.vfat /dev/loop0p1
+mkfs.ext4 /dev/loop0p2

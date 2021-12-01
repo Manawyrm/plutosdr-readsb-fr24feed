@@ -6,8 +6,9 @@ Building this image is done using qemu-user-static (by running the ArchLinux ARM
 __Please don't run this on your computer! Use a VM, Docker, GitHub Actions, etc.__  
 
 Using docker:  
+This uses loop mounts, chroot, binfmt, etc. and thus needs `--privileged` and a bind-mount for `/dev`.  
 ```bash
-docker run --rm -it --privileged --entrypoint bash debian:bullseye-slim
+docker run --rm -it --privileged -v /dev:/dev --entrypoint bash debian:bullseye-slim
 
 apt update -y
 apt install -y git
