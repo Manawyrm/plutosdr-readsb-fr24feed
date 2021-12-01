@@ -25,8 +25,8 @@ sed -i '/CheckSpace/d' /opt/mnt/etc/pacman.conf
 
 chroot /opt/mnt /build_arm.sh
 
-# create a 10GiB image file
-truncate -s 10G /opt/usb.img
+# create a 5GiB image file
+truncate -s 5G /opt/usb.img
 
 # partition it, MBR partition layout, 100MiB FAT32 config, rest as ext4
 sed -e 's/\s*\([\+0-9a-zA-Z]*\).*/\1/' << EOF | fdisk /opt/usb.img
