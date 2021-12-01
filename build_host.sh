@@ -1,29 +1,32 @@
 #!/bin/bash
 
 apt update
-apt dist-upgrade -y 
+apt dist-upgrade -y
 DEBIAN_FRONTEND=noninteractive apt -y install git build-essential wget qemu qemu-user-static binfmt-support libarchive-tools qemu-utils sudo rsync nano dosfstools pigz fdisk
 
 update-binfmts --enable qemu-arm
 
-mkdir /opt/mnt
+SCRIPT_DIR="$(dirname "$(realpath "$0")")"
+BUILD_DIR="${SCRIPT_DIR}/build"
+
+mkdir -p ${BUILD_DIR}
 wget http://os.archlinuxarm.org/os/ArchLinuxARM-zedboard-latest.tar.gz
-bsdtar -xpf ArchLinuxARM-zedboard-latest.tar.gz -C /opt/mnt
+bsdtar -xpf ArchLinuxARM-zedboard-latest.tar.gz -C ${BUILD_DIR}
 
-rsync -a rootfs/. /opt/mnt
+rsync -a rootfs/. ${BUILD_DIR}
 
-rm /opt/mnt/etc/resolv.conf
-echo "nameserver 8.8.8.8" > /opt/mnt/etc/resolv.conf
+rm ${BUILD_DIR}/etc/resolv.conf
+echo "nameserver 8.8.8.8" > ${BUILD_DIR}/etc/resolv.conf
 
-mount -t proc /proc /opt/mnt/proc/
-mount --rbind /sys /opt/mnt/sys/
-mount --rbind /dev /opt/mnt/dev/
+mount -t proc /proc ${BUILD_DIR}/proc/
+mount --rbind /sys ${BUILD_DIR}/sys/
+mount --rbind /dev ${BUILD_DIR}/dev/
 
 # pacman's CheckSpace mechanism doesn't work in a chroot which isn't on the root of a filesystem
 # Just disable it...
-sed -i '/CheckSpace/d' /opt/mnt/etc/pacman.conf
+sed -i '/CheckSpace/d' ${BUILD_DIR}/etc/pacman.conf
 
-chroot /opt/mnt /build_arm.sh
+chroot ${BUILD_DIR} /build_arm.sh
 
 # create a 5GiB image file
 truncate -s 5G /opt/usb.img
@@ -34,7 +37,7 @@ sed -e 's/\s*\([\+0-9a-zA-Z]*\).*/\1/' << EOF | fdisk /opt/usb.img
   n # new partition
   p # primary partition
   1 # partition number 1
-    # default - start at beginning of disk 
+    # default - start at beginning of disk
   +100M # 100 MB FAT32 config parttion
   t # Change partition type to FAT32
   0c # Hex code for W95 FAT32 (LBA)
@@ -66,16 +69,16 @@ mount ${loopdev}p1 /opt/usb_fat32
 mount ${loopdev}p2 /opt/usb_ext4
 
 # unmount the bind-mounts inside the chroot
-umount -fl /opt/mnt/proc
-umount -fl /opt/mnt/sys
-umount -fl /opt/mnt/dev
+umount -fl ${BUILD_DIR}/proc
+umount -fl ${BUILD_DIR}/sys
+umount -fl ${BUILD_DIR}/dev
 
-umount /opt/mnt/proc
-umount /opt/mnt/sys
-umount /opt/mnt/dev
+umount ${BUILD_DIR}/proc
+umount ${BUILD_DIR}/sys
+umount ${BUILD_DIR}/dev
 
-# copy the root fs to the ext4 partition 
-rsync -a /opt/mnt/. /opt/usb_ext4/
+# copy the root fs to the ext4 partition
+rsync -a ${BUILD_DIR}/. /opt/usb_ext4/
 rsync -a configfs/. /opt/usb_fat32/
 
 # unmount the partitions
