@@ -76,6 +76,7 @@ umount /opt/mnt/dev
 
 # copy the root fs to the ext4 partition 
 rsync -a /opt/mnt/. /opt/usb_ext4/
+rsync -a configfs/. /opt/usb_fat32/
 
 # unmount the partitions
 umount /opt/usb_fat32
