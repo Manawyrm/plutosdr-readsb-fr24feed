@@ -1,11 +1,10 @@
 # PlutoSDR standalone ADS-B FR24 feeder
 
-This project creates an image that can be flashed onto a USB flash drive, USB SSD or USB card reader, just like a Raspberry Pi image.
-When connected to a PlutoSDR (together with a USB->Ethernet converter), this turns the PlutoSDR into an inexpensive, very high performance ADS-B receiver and flightradar24 feeder.
+This project turns the PlutoSDR into an inexpensive, very high performance standalone ADS-B receiver and flightradar24 feeder.  
+It can be directly connected to the internet via a USB->Ethernet dongle.
 
+The fr24feed application as well as the readsb application runs on Arch Linux ARM:
 ![https://screenshot.tbspace.de/eapbuojdngt.png](https://screenshot.tbspace.de/eapbuojdngt.png)
-
-
 
 ### Checking the status
 You can check the status of the fr24feeder by visiting  
