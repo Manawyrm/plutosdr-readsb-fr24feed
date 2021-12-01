@@ -9,6 +9,8 @@ Using docker:
 ```bash
 docker run --rm -it --privileged --entrypoint bash debian:bullseye-slim
 
+apt update -y
+apt install -y git
 git clone https://github.com/Manawyrm/plutosdr-readsb-fr24feed
 cd plutosdr-readsb-fr24feed
 
