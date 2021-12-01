@@ -51,19 +51,19 @@ sed -e 's/\s*\([\+0-9a-zA-Z]*\).*/\1/' << EOF | fdisk /opt/usb.img
 EOF
 
 # loop mount the image file
-losetup -P /dev/loop0 /opt/usb.img
+loopdev=$(losetup -f --show -P /opt/usb.img)
 
 # create both file systems
-mkfs.vfat /dev/loop0p1
-mkfs.ext4 /dev/loop0p2
+mkfs.vfat ${loopdev}p1
+mkfs.ext4 ${loopdev}p2
 
 # create mount points
 mkdir /opt/usb_fat32
 mkdir /opt/usb_ext4
 
 # mount the filesystems
-mount /dev/loop0p1 /opt/usb_fat32
-mount /dev/loop0p2 /opt/usb_ext4
+mount ${loopdev}p1 /opt/usb_fat32
+mount ${loopdev}p2 /opt/usb_ext4
 
 # unmount the bind-mounts inside the chroot
 umount -fl /opt/mnt/proc
@@ -82,7 +82,7 @@ umount /opt/usb_fat32
 umount /opt/usb_ext4
 
 # unmount the loop mount
-losetup -D /dev/loop0
+losetup -D ${loopdev}
 
 # compress the resulting image (using multi-core gzip)
 time pigz /opt/usb.img
