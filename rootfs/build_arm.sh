@@ -3,7 +3,7 @@ pacman-key --init
 pacman-key --populate archlinuxarm
 
 pacman -Syu --noconfirm
-pacman --noconfirm -S htop screen ntp wget libiio libad9361 base-devel neofetch git
+pacman --noconfirm -S htop screen ntp wget libiio libad9361 base-devel neofetch git dhclient
 
 git clone "https://github.com/wiedehopf/readsb" /opt/readsb
 
