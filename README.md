@@ -22,7 +22,7 @@ http://pluto.local:8754/
 
 
 - ADS-B 1090 MHz antenna
-- recommended, but optional: 1090 MHz band-pass filter
+- highly recommended: 1090 MHz band-pass filter
 
 ### Installing plutosdr-readsb-fr24feed
 - Download the latest release: https://github.com/Manawyrm/plutosdr-readsb-fr24feed/releases
@@ -32,7 +32,7 @@ http://pluto.local:8754/
 - Plug the USB drive and USB ethernet adapter into the USB hub, connect to the PlutoSDR and connect the power supply.
 
 ### Opening a shell to the ArchLinux ARM system
-Run `/media/sdb2/shell.sh` via SSH.
+Run `/media/sd*/shell.sh` via SSH.
 
 ### Security
 **The PlutoSDR still offers an open SSH server with credentials root / analog when running this image.**  

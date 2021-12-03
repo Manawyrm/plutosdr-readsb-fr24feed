@@ -1,3 +1,4 @@
 #!/bin/sh
 
-chroot /media/sdb2 /bin/bash -c 'neofetch ; exec /bin/bash'
+cd "$(dirname "$0")"
+chroot . /bin/bash -c 'neofetch ; exec /bin/bash'

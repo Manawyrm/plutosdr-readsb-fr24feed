@@ -1,10 +1,12 @@
 #!/bin/sh
 
-cd /media/sdb2
+cd "$(dirname "$i")"
+
+FAT_PARTITION=$(echo "$(dirname "$i")" | sed 's/2/1/g')
 
 mount -t proc /proc proc/
 mount --rbind /sys sys/
 mount --rbind /dev dev/
-mount --rbind /media/sdb1/ /media/sdb2/mnt/
+mount --rbind ${FAT_PARTITION}/ mnt/
 
-chroot /media/sdb2 /start.sh
+chroot . /start.sh
