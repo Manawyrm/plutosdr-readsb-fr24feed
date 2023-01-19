@@ -11,7 +11,7 @@ cd /opt/readsb
 make PLUTOSDR=yes -j$(nproc)
 
 cd /opt
-wget "https://repo-feed.flightradar24.com/rpi_binaries/fr24feed_1.0.28-1_armhf.tgz"
-tar xfvz fr24feed_1.0.28-1_armhf.tgz
+wget "https://repo-feed.flightradar24.com/rpi_binaries/fr24feed_1.0.34-0_armhf.tgz"
+tar xfvz fr24feed_1.0.34-0_armhf.tgz
 
 ln -s /mnt/fr24feed.ini /etc/fr24feed.ini
